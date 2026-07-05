@@ -22,6 +22,7 @@ const navSections = [
   {
     label: 'OPERATIONS',
     items: [
+      { name: 'Admin Approvals', href: '/admin', icon: '✅', badge: 'Admin' },
       { name: 'Operators', href: '/operators', icon: '🏢', badge: 'Phase 2' },
       { name: 'Marketplace', href: '/marketplace', icon: '🛒', badge: 'Phase 2' },
     ],

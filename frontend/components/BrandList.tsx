@@ -8,7 +8,8 @@ import { buildApproveBrandTx, submitTransaction } from '@/lib/stellar';
 interface BrandListProps {
   brands: Brand[];
   loading: boolean;
-  onApproveSuccess: () => void;
+  onApproveSuccess?: () => void;
+  mode?: 'all' | 'approved' | 'pending';
 }
 
 function shortAddress(addr: string): string {
@@ -25,11 +26,17 @@ function formatTimestamp(ts: number): string {
   });
 }
 
-export default function BrandList({ brands, loading, onApproveSuccess }: BrandListProps) {
+export default function BrandList({ brands, loading, onApproveSuccess, mode = 'all' }: BrandListProps) {
   const { kit, publicKey, isConnected } = useWallet();
   const [approvingKey, setApprovingKey] = useState<string | null>(null);
 
-  const sorted = [...brands].sort((a, b) => b.timestamp - a.timestamp);
+  const filtered = brands.filter((b) => {
+    if (mode === 'approved') return b.status === 'Approved';
+    if (mode === 'pending') return b.status === 'Pending';
+    return true;
+  });
+
+  const sorted = [...filtered].sort((a, b) => b.timestamp - a.timestamp);
 
   const handleApprove = async (ownerToApprove: string, brandName: string) => {
     if (!isConnected || !publicKey) return;
@@ -45,7 +52,9 @@ export default function BrandList({ brands, loading, onApproveSuccess }: BrandLi
       });
       
       await submitTransaction(result.signedTxXdr);
-      onApproveSuccess();
+      if (onApproveSuccess) {
+        onApproveSuccess();
+      }
     } catch (err) {
       console.error("Approval failed:", err);
       alert("Failed to approve brand. See console for details.");

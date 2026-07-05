@@ -117,7 +117,7 @@ export default function Home() {
 
         {/* Right column */}
         <div className="lg:col-span-7 space-y-6">
-          <BrandList brands={brands} loading={brandsLoading} onApproveSuccess={handleApproveSuccess} />
+          <BrandList brands={brands} loading={brandsLoading} onApproveSuccess={handleApproveSuccess} mode="approved" />
           <ActivityFeed events={events} />
         </div>
       </div>
