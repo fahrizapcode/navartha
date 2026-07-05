@@ -22,6 +22,10 @@ function parseScValToBrand(scVal: StellarSdk.xdr.ScVal): Brand | null {
     let name = '';
     let owner = '';
     let timestamp = 0;
+    let status = 'Pending';
+    let verified = false;
+    let approved_at = 0;
+    let approver = '';
 
     for (const entry of map) {
       const key = entry.key().sym()?.toString();
@@ -29,9 +33,19 @@ function parseScValToBrand(scVal: StellarSdk.xdr.ScVal): Brand | null {
       if (key === 'name') name = StellarSdk.scValToNative(val) as string;
       if (key === 'owner') owner = StellarSdk.Address.fromScVal(val).toString();
       if (key === 'timestamp') timestamp = Number(StellarSdk.scValToNative(val));
+      if (key === 'status') status = StellarSdk.scValToNative(val) as string;
+      if (key === 'verified') verified = StellarSdk.scValToNative(val) as boolean;
+      if (key === 'approved_at') approved_at = Number(StellarSdk.scValToNative(val));
+      if (key === 'approver') {
+        try {
+          approver = StellarSdk.Address.fromScVal(val).toString();
+        } catch {
+          approver = '';
+        }
+      }
     }
 
-    return { name, owner, timestamp };
+    return { name, owner, timestamp, status, verified, approved_at, approver };
   } catch {
     return null;
   }
@@ -72,7 +86,7 @@ export async function fetchAllBrands(): Promise<Brand[]> {
 }
 
 /**
- * Build and return the assembled + signed XDR for register_brand
+ * Build and return the assembled transaction for register_brand
  */
 export async function buildRegisterBrandTx(
   ownerPublicKey: string,
@@ -88,6 +102,40 @@ export async function buildRegisterBrandTx(
     .addOperation(
       contract.call(
         'register_brand',
+        StellarSdk.nativeToScVal(ownerPublicKey, { type: 'address' }),
+        StellarSdk.nativeToScVal(brandName, { type: 'string' })
+      )
+    )
+    .setTimeout(30)
+    .build();
+
+  const simResult = await rpcServer.simulateTransaction(tx);
+  if (!StellarSdk.rpc.Api.isSimulationSuccess(simResult)) {
+    throw new Error('Simulation failed: ' + JSON.stringify(simResult));
+  }
+
+  return StellarSdk.rpc.assembleTransaction(tx, simResult).build();
+}
+
+/**
+ * Build and return the assembled transaction for approve_brand
+ */
+export async function buildApproveBrandTx(
+  adminPublicKey: string,
+  ownerPublicKey: string,
+  brandName: string
+): Promise<StellarSdk.Transaction> {
+  const contract = new StellarSdk.Contract(CONTRACT_ID);
+  const account = await rpcServer.getAccount(adminPublicKey);
+
+  const tx = new StellarSdk.TransactionBuilder(account, {
+    fee: StellarSdk.BASE_FEE,
+    networkPassphrase: NETWORK_PASSPHRASE,
+  })
+    .addOperation(
+      contract.call(
+        'approve_brand',
+        StellarSdk.nativeToScVal(adminPublicKey, { type: 'address' }),
         StellarSdk.nativeToScVal(ownerPublicKey, { type: 'address' }),
         StellarSdk.nativeToScVal(brandName, { type: 'string' })
       )
@@ -134,7 +182,7 @@ export async function submitTransaction(signedXdr: string): Promise<string> {
 }
 
 /**
- * Poll for BrandRegistered events from contract
+ * Poll for BrandRegistered and BrandApproved events from contract
  */
 export async function fetchBrandEvents(startLedger: number): Promise<ActivityEvent[]> {
   if (CONTRACT_ID === 'PLACEHOLDER_CONTRACT_ID') return [];
@@ -155,14 +203,20 @@ export async function fetchBrandEvents(startLedger: number): Promise<ActivityEve
     return events.events
       .filter((e) => {
         const topic0 = e.topic[0];
-        return topic0 && StellarSdk.scValToNative(topic0) === 'BrandRegistered';
+        if (!topic0) return false;
+        const name = StellarSdk.scValToNative(topic0);
+        return name === 'BrandRegistered' || name === 'BrandApproved';
       })
       .map((e, i) => {
+        const topic0 = e.topic[0];
+        const eventType = StellarSdk.scValToNative(topic0) as string;
+
         const val = e.value;
         const map = val?.map?.() || [];
         let brandName = '';
         let owner = '';
         let timestamp = 0;
+        let approver = '';
 
         try {
           for (const entry of map) {
@@ -170,6 +224,13 @@ export async function fetchBrandEvents(startLedger: number): Promise<ActivityEve
             if (key === 'name') brandName = StellarSdk.scValToNative(entry.val()) as string;
             if (key === 'owner') owner = StellarSdk.Address.fromScVal(entry.val()).toString();
             if (key === 'timestamp') timestamp = Number(StellarSdk.scValToNative(entry.val()));
+            if (key === 'approver') {
+              try {
+                approver = StellarSdk.Address.fromScVal(entry.val()).toString();
+              } catch {
+                approver = '';
+              }
+            }
           }
         } catch {
           brandName = 'Unknown';
@@ -177,10 +238,12 @@ export async function fetchBrandEvents(startLedger: number): Promise<ActivityEve
 
         return {
           id: `${e.txHash}-${i}`,
+          type: eventType as 'BrandRegistered' | 'BrandApproved',
           brandName,
           owner,
           timestamp,
           txHash: e.txHash,
+          approver: approver || undefined,
         };
       });
   } catch (e) {

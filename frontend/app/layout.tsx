@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Sidebar from "@/components/Sidebar";
+import { WalletProvider } from "@/context/WalletContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NavArtha Brand Registry | Stellar Level 2 dApp",
-  description: "Platform pendaftaran brand UMKM di blockchain Stellar menggunakan Soroban Smart Contract. MVP NavArtha untuk transparansi bisnis Indonesia.",
+  title: "NavArtha — RWA Platform for Private Investors",
+  description: "Platform Real World Asset (RWA) untuk investor privat, dibangun di atas blockchain Stellar dengan Soroban Smart Contract. Brand registry, investment opportunities, dan revenue sharing.",
 };
 
 export default function RootLayout({
@@ -28,7 +30,16 @@ export default function RootLayout({
       suppressHydrationWarning={true}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full bg-gray-50">
+        <WalletProvider>
+          <Sidebar />
+          <main className="ml-64 min-h-screen">
+            <div className="max-w-7xl mx-auto px-6 py-8">
+              {children}
+            </div>
+          </main>
+        </WalletProvider>
+      </body>
     </html>
   );
 }
