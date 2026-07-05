@@ -5,6 +5,7 @@ import { Brand } from '@/types';
 import { fetchAllBrands } from '@/lib/stellar';
 import WalletSection from '@/components/WalletSection';
 import BrandList from '@/components/BrandList';
+import AdminGuard from '@/components/AdminGuard';
 
 export default function AdminDashboard() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -35,29 +36,31 @@ export default function AdminDashboard() {
   }, [loadBrands]);
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Admin Approvals</h1>
-        <p className="text-gray-500 mt-1">Review dan setujui pendaftaran brand baru dari pengguna.</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left column */}
-        <div className="lg:col-span-4 space-y-6">
-          <WalletSection />
+    <AdminGuard>
+      <div className="space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Admin Approvals</h1>
+          <p className="text-gray-500 mt-1">Review dan setujui pendaftaran brand baru dari pengguna.</p>
         </div>
 
-        {/* Right column */}
-        <div className="lg:col-span-8 space-y-6">
-          <BrandList 
-            brands={brands} 
-            loading={brandsLoading} 
-            onApproveSuccess={handleApproveSuccess} 
-            mode="pending" 
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left column */}
+          <div className="lg:col-span-4 space-y-6">
+            <WalletSection />
+          </div>
+
+          {/* Right column */}
+          <div className="lg:col-span-8 space-y-6">
+            <BrandList 
+              brands={brands} 
+              loading={brandsLoading} 
+              onApproveSuccess={handleApproveSuccess} 
+              mode="pending" 
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </AdminGuard>
   );
 }

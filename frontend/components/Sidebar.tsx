@@ -2,8 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useWallet } from '@/context/WalletContext';
 
-const navSections = [
+type NavItem = {
+  name: string;
+  href: string;
+  icon: string;
+  badge?: string;
+  adminOnly?: boolean;
+};
+
+type NavSection = {
+  label: string;
+  items: NavItem[];
+};
+
+const navSections: NavSection[] = [
   {
     label: 'CORE',
     items: [
@@ -22,7 +36,7 @@ const navSections = [
   {
     label: 'OPERATIONS',
     items: [
-      { name: 'Admin Approvals', href: '/admin', icon: '✅', badge: 'Admin' },
+      { name: 'Admin Approvals', href: '/admin', icon: '✅', badge: 'Admin', adminOnly: true },
       { name: 'Operators', href: '/operators', icon: '🏢', badge: 'Phase 2' },
       { name: 'Marketplace', href: '/marketplace', icon: '🛒', badge: 'Phase 2' },
     ],
@@ -45,6 +59,7 @@ const navSections = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { isAdmin } = useWallet();
 
   return (
     <aside className="fixed top-0 left-0 z-40 h-screen w-64 bg-gray-900 text-gray-300 flex flex-col overflow-y-auto">
@@ -77,18 +92,20 @@ export default function Sidebar() {
               {section.label}
             </p>
             <ul className="space-y-0.5">
-              {section.items.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group ${
-                        isActive
-                          ? 'bg-blue-600/20 text-blue-400'
-                          : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
-                      }`}
-                    >
+              {section.items
+                .filter((item) => !item.adminOnly || isAdmin)
+                .map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group ${
+                          isActive
+                            ? 'bg-blue-600/20 text-blue-400'
+                            : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                        }`}
+                      >
                       <span className="text-base">{item.icon}</span>
                       <span className="flex-1 truncate">{item.name}</span>
                       {item.badge && (

@@ -3,11 +3,13 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { StellarWalletsKit, Networks } from '@creit.tech/stellar-wallets-kit';
 import { FreighterModule, FREIGHTER_ID } from '@creit.tech/stellar-wallets-kit/modules/freighter';
+import { isAdminWallet } from '@/lib/adminWallets';
 
 interface WalletContextType {
   kit: any;
   publicKey: string | null;
   isConnected: boolean;
+  isAdmin: boolean;
   isConnecting: boolean;
   error: string | null;
   connect: () => Promise<void>;
@@ -66,7 +68,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   return (
     <WalletContext.Provider
-      value={{ kit: StellarWalletsKit, publicKey, isConnected: !!publicKey, isConnecting, error, connect, disconnect }}
+      value={{
+        kit: StellarWalletsKit,
+        publicKey,
+        isConnected: !!publicKey,
+        isAdmin: isAdminWallet(publicKey),
+        isConnecting,
+        error,
+        connect,
+        disconnect,
+      }}
     >
       {children}
     </WalletContext.Provider>
