@@ -190,13 +190,13 @@ Or use [Stellar Laboratory](https://laboratory.stellar.org/#create-account?netwo
 ## Contract Address
 
 ```
-Contract ID: PLACEHOLDER — Update after deployment
-Explorer: https://stellar.expert/explorer/testnet/contract/<CONTRACT_ID>
+Contract ID: CC7XUZJ2FFMA64XKX2W5LG5YKUG7GPMQZFDM3NXLWTULQD26NGPZ2ON6
+Explorer: https://stellar.expert/explorer/testnet/contract/CC7XUZJ2FFMA64XKX2W5LG5YKUG7GPMQZFDM3NXLWTULQD26NGPZ2ON6
 ```
 
 ## Sample Transaction Hash
 
 ```
-TX Hash: PLACEHOLDER — Update after first successful registration
-Explorer: https://stellar.expert/explorer/testnet/tx/<TX_HASH>
+TX Hash: 500b9c8b3a30872241df4b36743396d8c5fd15bf2b6296804223ce3e762f1d81
+Explorer: https://stellar.expert/explorer/testnet/tx/500b9c8b3a30872241df4b36743396d8c5fd15bf2b6296804223ce3e762f1d81
 ```
