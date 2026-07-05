@@ -176,14 +176,37 @@ Or use [Stellar Laboratory](https://laboratory.stellar.org/#create-account?netwo
 
 ---
 
-## Screenshots
+## 📸 Screenshots
 
-- [ ] Wallet connected state (StellarWalletsKit modal)
-- [ ] Brand Registration form
-- [ ] Transaction pending → success state
-- [ ] Transaction hash + Stellar Expert link
-- [ ] Brand list populated from contract
-- [ ] Activity feed showing BrandRegistered event
+### 1. 🔗 Wallet Connected & Brand Registration
+
+Users connect their Stellar wallet using **StellarWalletsKit**, which supports Freighter, Albedo, xBull, and other popular Stellar wallets. Once connected, the brand registration form becomes available. The form includes input validation and prepares a Soroban smart contract transaction for submission.
+
+![Wallet Connected & Brand Registration Form](frontend/public/connectwallet-brandform.png)
+
+---
+
+### 2. ⏳ Transaction Pending
+
+After submitting the registration form, the application enters a loading state while the transaction is signed by the connected wallet and submitted to the Stellar Testnet. During this phase, the submit button is disabled and a loading indicator is displayed to reflect the pending transaction status.
+
+![Transaction Pending](frontend/public/tx-pending.png)
+
+---
+
+### 3. ✅ Transaction Success
+
+Once the transaction is confirmed on-chain, the UI displays a success message along with the transaction hash. A direct link to **Stellar Expert** is provided so users can independently verify the transaction on the blockchain.
+
+![Transaction Success](frontend/public/tx-success.png)
+
+---
+
+### 4. 📋 Registered Brands & Activity Feed
+
+The frontend fetches all registered brands directly from the deployed Soroban smart contract via Stellar RPC. Every successful brand registration emits a `BrandRegistered` event, which is captured and displayed in the real-time activity feed.
+
+![Registered Brands & Activity Feed](frontend/public/brandregistered-feed.png)
 
 ---
 

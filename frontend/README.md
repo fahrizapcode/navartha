@@ -1,39 +1,5 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## 📸 Screenshots
-
-### 1. 🔗 Wallet Connected & Brand Registration
-
-Users connect their Stellar wallet using **StellarWalletsKit**, which supports Freighter, Albedo, xBull, and other popular Stellar wallets. Once connected, the brand registration form becomes available. The form includes input validation and prepares a Soroban smart contract transaction for submission.
-
-![Wallet Connected & Brand Registration Form](public/connectwallet-brandform.png)
-
----
-
-### 2. ⏳ Transaction Pending
-
-After submitting the registration form, the application enters a loading state while the transaction is signed by the connected wallet and submitted to the Stellar Testnet. During this phase, the submit button is disabled and a loading indicator is displayed to reflect the pending transaction status.
-
-![Transaction Pending](public/tx-pending.png)
-
----
-
-### 3. ✅ Transaction Success
-
-Once the transaction is confirmed on-chain, the UI displays a success message along with the transaction hash. A direct link to **Stellar Expert** is provided so users can independently verify the transaction on the blockchain.
-
-![Transaction Success](public/tx-success.png)
-
----
-
-### 4. 📋 Registered Brands & Activity Feed
-
-The frontend fetches all registered brands directly from the deployed Soroban smart contract via Stellar RPC. Every successful brand registration emits a `BrandRegistered` event, which is captured and displayed in the real-time activity feed.
-
-![Registered Brands & Activity Feed](public/brandregistered-feed.png)
-
----
-
 ## Getting Started
 
 First, run the development server:
