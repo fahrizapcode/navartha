@@ -176,6 +176,29 @@ Or use [Stellar Laboratory](https://laboratory.stellar.org/#create-account?netwo
 
 ---
 
+## Admin Access (Frontend)
+
+This dApp implements a frontend-only admin access control based on Stellar public keys. The admin check is performed entirely in the browser using the connected wallet's public key and a whitelist configured via environment variable.
+
+- Configure admin wallets via `.env.local`:
+
+```env
+NEXT_PUBLIC_ADMIN_WALLETS=GADMINPUBLICKEY1,GADMINPUBLICKEY2
+```
+
+- Behavior:
+  - When a user connects a wallet, the frontend reads the wallet's public key.
+  - The helper `isAdminWallet` checks if the public key exists in `NEXT_PUBLIC_ADMIN_WALLETS` (or a fallback default list in code).
+  - If the connected wallet is an admin, the `Admin Approvals` menu appears in the sidebar and the user can access `/admin`.
+  - If not an admin, the admin menu is hidden and direct access to `/admin` will show an unauthorized message or redirect to `/`.
+
+Notes:
+  - This is a UI-level check (convenient and simple). For stronger security, protect admin actions on-chain or via a server-side ACL.
+  - The relevant frontend files are `frontend/lib/adminWallets.ts`, `frontend/context/WalletContext.tsx`, `frontend/components/AdminGuard.tsx`, and `frontend/components/Sidebar.tsx`.
+
+
+---
+
 ## 📸 Screenshots
 
 ### 1. 🔗 Wallet Connected & Brand Registration
